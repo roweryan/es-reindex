@@ -100,10 +100,13 @@ unless retried_request(:get, "#{durl}/#{didx}/_recovery")
   end
   settings = Oj.load settings
   sidx = settings.keys[0]
-  settings[sidx].delete 'index.version.created'
+  settings[sidx]['settings']['index'].delete 'creation_date'
+  settings[sidx]['settings']['index'].delete 'uuid'
+  settings[sidx]['settings']['index'].delete 'version'
+
   printf 'Creating \'%s/%s\' index with settings from \'%s/%s\'... ',
       durl, didx, surl, sidx
-  unless retried_request(:post, "#{durl}/#{didx}", Oj.dump(settings[sidx]))
+  unless retried_request(:put, "#{durl}/#{didx}", Oj.dump(settings[sidx]))
     puts 'FAILED!'
     exit 1
   else
